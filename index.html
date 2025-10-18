@@ -1,64 +1,206 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>QR Details</title>
-  <style>
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 0; padding: 2rem; }
-    .card { max-width: 720px; margin: 0 auto; padding: 1.5rem; border: 1px solid #e5e7eb; border-radius: 16px; box-shadow: 0 10px 20px rgba(0,0,0,0.06); }
-    .muted { color: #6b7280; }
-    h1 { margin-top: 0; }
-    .error { color: #b91c1c; background: #fee2e2; padding: .75rem 1rem; border-radius: 12px; }
-    .meta { margin-top: 1rem; font-size: .9rem; color: #6b7280; }
-    .grid { display: grid; grid-template-columns: 140px 1fr; gap: .5rem 1rem; }
-    .key { font-weight: 600; color: #374151; }
-    .value { color: #111827; }
-    footer { margin-top: 2rem; text-align: center; color: #9ca3af; font-size: .9rem; }
-    a { color: #2563eb; text-decoration: none; }
-    a:hover { text-decoration: underline; }
-  </style>
-</head>
-<body>
-  <div class="card">
-    <h1>Details</h1>
-    <div id="content" class="muted">Loading…</div>
-    <div class="meta" id="meta"></div>
-  </div>
-  <footer>Powered by a tiny serverless function. Swap the data in <code>getDetail.js</code>.</footer>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Zohair &amp; Sheiza — Wedding Invitation</title>
 
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <!-- Tailwind (CDN) -->
+  <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    function qs(name) {
-      const params = new URLSearchParams(location.search);
-      return params.get(name);
-    }
-    const id = qs('id') || 'ABC123';
-    document.getElementById('meta').textContent = "Query id = " + id;
-
-    async function fetchDetail() {
-      const endpoint = '/api/getDetail?id=' + encodeURIComponent(id);
-      try {
-        const res = await fetch(endpoint, { headers: { 'Accept': 'application/json' } });
-        const data = await res.json();
-        if (!res.ok || data.error) throw new Error(data.error || ('HTTP ' + res.status));
-        render(data);
-      } catch (err) {
-        document.getElementById('content').innerHTML =
-          '<div class="error">Error: ' + err.message + '</div>';
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            gold: '#D4AF37',
+            champagne: '#C9B27C',
+            ivory: '#F7F4EC',
+            ink: '#1F1A17',
+          },
+          fontFamily: {
+            serif: ['Playfair Display','serif'],
+            sans: ['Poppins','ui-sans-serif','system-ui'],
+          },
+          boxShadow: {
+            soft: '0 10px 30px rgba(0,0,0,.06)'
+          }
+        }
       }
     }
+  </script>
 
-    function render(data) {
-      const content = document.getElementById('content');
-      const fields = Object.entries(data).map(([k, v]) => {
-        const value = (typeof v === 'object') ? JSON.stringify(v) : v;
-        return `<div class="key">${k}</div><div class="value">${value}</div>`
-      }).join('');
-      content.classList.remove('muted');
-      content.innerHTML = '<div class="grid">' + fields + '</div>';
+  <style>
+    :root {
+      --gold: #D4AF37;
+      --champagne: #C9B27C;
+      --ivory: #F7F4EC;
+      --ink: #1F1A17;
     }
+    body {
+      background:
+        radial-gradient(1200px 800px at 10% -10%, rgba(212,175,55,.08), transparent 40%),
+        radial-gradient(1200px 800px at 110% 110%, rgba(201,178,124,.10), transparent 40%),
+        var(--ivory);
+      color: var(--ink);
+    }
+    /* Gold gradient text helper */
+    .gold-text {
+      background: linear-gradient(90deg, var(--gold), var(--champagne));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    /* Print: A5 portrait per card, two pages */
+    @page { size: A5; margin: 12mm; }
+    @media print {
+      .no-print { display: none !important; }
+      body { background: white !important; }
+      .card { box-shadow: none !important; }
+    }
+    /* Subtle foil-like border */
+    .foil-border {
+      position: relative;
+    }
+    .foil-border:before {
+      content: "";
+      position: absolute; inset: -1px;
+      border-radius: 22px;
+      background: linear-gradient(145deg, rgba(212,175,55,.55), rgba(201,178,124,.35), rgba(255,255,255,.2));
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+              mask-composite: exclude;
+      padding: 1px;
+    }
+    /* Floral corner SVG as background (very light) */
+    .floral {
+      background-image:
+        url('data:image/svg+xml;utf8,<?xml version="1.0" ?><svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 200 200"><g fill="none" stroke="%23C9B27C" stroke-opacity=".35" stroke-width="1.2"><path d="M10,160 C40,130 70,120 90,130 C95,120 110,100 140,95 C110,90 95,70 95,55 C75,65 60,75 52,92 C40,78 26,70 10,68"/></g></svg>');
+      background-repeat: no-repeat;
+      background-size: 40% 40%;
+      background-position: 100% 100%;
+    }
+  </style>
+</head>
 
-    fetchDetail();
+<body class="min-h-full font-sans">
+  <!-- Top bar actions -->
+  <header class="no-print sticky top-0 z-10 bg-ivory/80 backdrop-blur border-b border-champagne/20">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-gold to-champagne ring-1 ring-champagne/40"></div>
+        <span class="font-serif text-lg tracking-wide">Wedding Invitation</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="window.print()" class="no-print px-4 py-2 rounded-xl border border-champagne/50 hover:border-gold/70 text-sm">
+          Print Cards (A5)
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="max-w-3xl mx-auto text-center pt-12 pb-6 px-4">
+    <div class="inline-flex items-center gap-2 text-xs tracking-widest uppercase text-champagne/80">In the name of Allah</div>
+    <div class="mt-3 text-4xl sm:text-5xl font-serif gold-text">Zohair &amp; Sheiza</div>
+    <p class="mt-3 text-sm text-ink/70">We warmly invite you to our wedding celebration</p>
+
+    <!-- Verse -->
+    <figure class="mt-6 mx-auto max-w-2xl bg-white/60 rounded-2xl shadow-soft p-5 foil-border">
+      <blockquote class="text-base sm:text-lg leading-relaxed italic">
+        “There is no better bond between two loved ones than Nikah.”
+      </blockquote>
+      <figcaption class="mt-2 text-xs text-ink/60">— Prophetic tradition (paraphrased)</figcaption>
+    </figure>
+  </section>
+
+  <!-- Cards -->
+  <main class="max-w-5xl mx-auto px-4 pb-16 grid md:grid-cols-2 gap-8">
+    <!-- Nikah Card -->
+    <article class="card rounded-3xl bg-white floral shadow-soft p-7 foil-border">
+      <header class="text-center">
+        <h2 class="text-champagne tracking-widest text-xs uppercase">Nikah Ceremony</h2>
+        <div class="mt-1 text-2xl font-serif">The Sacred Bond</div>
+      </header>
+      <section class="mt-6 space-y-4">
+        <div>
+          <div class="text-sm text-ink/60 uppercase tracking-wide">Date</div>
+          <div class="text-lg">14 November 2025</div>
+        </div>
+        <div>
+          <div class="text-sm text-ink/60 uppercase tracking-wide">Time</div>
+          <div class="text-lg">4pm — 7pm</div>
+        </div>
+        <div>
+          <div class="text-sm text-ink/60 uppercase tracking-wide">Venue</div>
+          <div class="text-lg">Hameed Khan Garden C-12</div>
+          <div class="text-sm text-ink/70">Islamabad</div>
+        </div>
+      </section>
+      <footer class="mt-6 pt-5 border-t border-champagne/30 text-center text-sm text-ink/70">
+        Dress code: Traditional
+      </footer>
+    </article>
+
+    <!-- Walima Card -->
+    <article class="card rounded-3xl bg-white floral shadow-soft p-7 foil-border">
+      <header class="text-center">
+        <h2 class="text-champagne tracking-widest text-xs uppercase">Walima Reception</h2>
+        <div class="mt-1 text-2xl font-serif">A Joyous Feast</div>
+      </header>
+      <section class="mt-6 space-y-4">
+        <div>
+          <div class="text-sm text-ink/60 uppercase tracking-wide">Date</div>
+          <div class="text-lg">16 November 2025</div>
+        </div>
+        <div>
+          <div class="text-sm text-ink/60 uppercase tracking-wide">Time</div>
+          <div class="text-lg">7pm — 10pm</div>
+        </div>
+        <div>
+          <div class="text-sm text-ink/60 uppercase tracking-wide">Venue</div>
+          <div class="text-lg">Fortress Events Complex</div>
+          <div class="text-sm text-ink/70">Express Highway,Islamabad</div>
+        </div>
+      </section>
+      <footer class="mt-6 pt-5 border-t border-champagne/30 text-center text-sm text-ink/70">
+        With love and duas — We look forward to celebrating with you
+      </footer>
+    </article>
+  </main>
+
+  <!-- Footer / RSVP -->
+  <footer class="pb-20">
+    <div class="max-w-3xl mx-auto px-4 text-center">
+      <div class="text-xs tracking-widest uppercase text-champagne/80">RSVP</div>
+      <div class="mt-2 text-sm text-ink/70">
+        Kindly confirm your presence by 12 November. <br/>
+        <a href="mailto:zohair739@gmail.com" class="underline decoration-champagne/60 hover:text-gold">zohair739@gmail.com</a> •
+        <a href="tel:+92XXXXXXXXXX" class="underline decoration-champagne/60 hover:text-gold">+92 331 504 15 93</a>
+      </div>
+      <div class="mt-6 text-xs text-ink/50">Please arrive on time • Family event • Children welcome</div>
+    </div>
+  </footer>
+
+  <!-- Optional: tiny script to swap names/dates via URL params -->
+  <script>
+    // Example: ?groom=Zohair&bride=Sheiza&nikah=1 Jan 2026&walima=3 Jan 2026
+    const P = new URLSearchParams(location.search);
+    const setText = (selector, text) => { if (!text) return; const el = document.querySelector(selector); if (el) el.textContent = text; };
+
+    const groom = P.get('groom'); const bride = P.get('bride');
+    if (groom || bride) document.title = `${groom||'Groom'} & ${bride||'Bride'} — Wedding Invitation`;
+    // Dates/Times
+    setText('.nikah-date', P.get('nikah'));
+    setText('.nikah-time', P.get('nikah_time'));
+    setText('.nikah-venue', P.get('nikah_venue'));
+    setText('.walima-date', P.get('walima'));
+    setText('.walima-time', P.get('walima_time'));
+    setText('.walima-venue', P.get('walima_venue'));
   </script>
 </body>
 </html>
